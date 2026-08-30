@@ -1,0 +1,82 @@
+body {
+    font-family: system-ui, sans-serif;
+    max-width: 760px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.5;
+}
+
+button,
+input,
+select {
+    font: inherit;
+    padding: 8px 12px;
+}
+
+button {
+    cursor: pointer;
+}
+
+.card {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+}
+
+#answerArea,
+#results {
+    display: none;
+}
+
+.big {
+    font-size: 1.25rem;
+}
+
+.muted {
+    color: #666;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 12px;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 7px;
+    text-align: left;
+}
+
+.ok {
+    font-weight: 700;
+}
+
+/* Mobile / responsive */
+@media (max-width: 600px) {
+    body {
+        margin: 20px auto;
+        padding: 0 14px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    button,
+    select {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    #playBtn,
+    #nextBtn {
+        margin-top: 8px;
+    }
+
+    table {
+        font-size: 0.95rem;
+    }
+}

@@ -36,19 +36,7 @@
     <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1536x2048.png">
     <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="splash/splash-2048x1536.png">
     <title>Test d'oreille absolue</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
-        button, input, select { font: inherit; padding: 8px 12px; }
-        button { cursor: pointer; }
-        .card { border: 1px solid #ccc; border-radius: 10px; padding: 20px; margin: 16px 0; }
-        #answerArea { display: none; }
-        #results { display: none; }
-        .big { font-size: 1.25rem; }
-        .muted { color: #666; }
-        table { border-collapse: collapse; width: 100%; margin-top: 12px; }
-        th, td { border: 1px solid #ccc; padding: 7px; text-align: left; }
-        .ok { font-weight: 700; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Test d'oreille absolue</h1>
@@ -58,41 +46,40 @@
     </p>
     <div class="card" id="setup">
         <label>
-        Nombre de questions :
-        <select id="questionCount">
-            <option>20</option>
-            <option>50</option>
-            <option selected>100</option>
-        </select>
+            Nombre de questions :
+            <select id="questionCount">
+                <option>20</option>
+                <option>50</option>
+                <option selected>100</option>
+            </select>
         </label>
         <p class="muted">
-        Les fichiers audio doivent être dans <code>sounds/</code> et porter les noms
-        indiqués dans le bloc CONFIGURATION du code.
+            Les fichiers audio doivent être dans <code>sounds/</code>.
         </p>
         <button id="startBtn">Commencer</button>
     </div>
-    <div class="card" id="test" style="display:none">
+    <div class="card" id="test">
         <p class="big">Question <span id="progress">1 / 100</span></p>
         <button id="playBtn">▶ Jouer la note</button>
         <audio id="audio" preload="auto"></audio>
         <div id="answerArea">
-        <p>Ta réponse :</p>
-        <select id="answer">
-            <option value="">-- Choisir une note --</option>
-            <option value="C">Do</option>
-            <option value="C#">Do♯ / Ré♭</option>
-            <option value="D">Ré</option>
-            <option value="D#">Ré♯ / Mi♭</option>
-            <option value="E">Mi</option>
-            <option value="F">Fa</option>
-            <option value="F#">Fa♯ / Sol♭</option>
-            <option value="G">Sol</option>
-            <option value="G#">Sol♯ / La♭</option>
-            <option value="A">La</option>
-            <option value="A#">La♯ / Si♭</option>
-            <option value="B">Si</option>
-        </select>
-        <button id="nextBtn">Valider et continuer</button>
+            <p>Ta réponse :</p>
+            <select id="answer">
+                <option value="">-- Choisir une note --</option>
+                <option value="C">Do</option>
+                <option value="C#">Do♯ / Ré♭</option>
+                <option value="D">Ré</option>
+                <option value="D#">Ré♯ / Mi♭</option>
+                <option value="E">Mi</option>
+                <option value="F">Fa</option>
+                <option value="F#">Fa♯ / Sol♭</option>
+                <option value="G">Sol</option>
+                <option value="G#">Sol♯ / La♭</option>
+                <option value="A">La</option>
+                <option value="A#">La♯ / Si♭</option>
+                <option value="B">Si</option>
+            </select>
+            <button id="nextBtn">Valider et continuer</button>
         </div>
         <p class="muted" id="message"></p>
     </div>
@@ -105,210 +92,6 @@
         <div id="mistakes"></div>
         <button id="restartBtn">Nouveau test</button>
     </div>
-    <script>
-    const NOTES = [
-        { id: "C",  name: "Do",       file: "C4.wav" },
-        { id: "C#", name: "Do♯",      file: "Csharp4.wav" },
-        { id: "D",  name: "Ré",       file: "D4.wav" },
-        { id: "D#", name: "Ré♯",      file: "Dsharp4.wav" },
-        { id: "E",  name: "Mi",       file: "E4.wav" },
-        { id: "F",  name: "Fa",       file: "F4.wav" },
-        { id: "F#", name: "Fa♯",      file: "Fsharp4.wav" },
-        { id: "G",  name: "Sol",      file: "G4.wav" },
-        { id: "G#", name: "Sol♯",     file: "Gsharp4.wav" },
-        { id: "A",  name: "La",       file: "A4.wav" },
-        { id: "A#", name: "La♯",      file: "Asharp4.wav" },
-        { id: "B",  name: "Si",       file: "B4.wav" }
-    ];
-
-    let totalQuestions = 100;
-    let current = 0;
-    let currentNote = null;
-    let results = [];
-
-    // Éléments
-    const setup = document.getElementById("setup");
-    const test = document.getElementById("test");
-    const resultsBox = document.getElementById("results");
-    const startBtn = document.getElementById("startBtn");
-    const playBtn = document.getElementById("playBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const audio = document.getElementById("audio");
-    const answerArea = document.getElementById("answerArea");
-    const answer = document.getElementById("answer");
-    const progress = document.getElementById("progress");
-    const message = document.getElementById("message");
-
-    // Mélange Fisher-Yates
-    function shuffle(array) {
-    const a = [...array];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-    }
-
-    // Génère une liste équilibrée : chaque note apparaît autant que possible.
-    function generateTest(count) {
-    const pool = [];
-    while (pool.length < count) {
-        pool.push(...shuffle(NOTES));
-    }
-    return pool.slice(0, count);
-    }
-
-    let testNotes = [];
-
-    function startTest() {
-    totalQuestions = Number(document.getElementById("questionCount").value);
-    current = 0;
-    results = [];
-    testNotes = generateTest(totalQuestions);
-
-    setup.style.display = "none";
-    resultsBox.style.display = "none";
-    test.style.display = "block";
-
-    loadQuestion();
-    }
-
-    function loadQuestion() {
-    currentNote = testNotes[current];
-
-    progress.textContent = `${current + 1} / ${totalQuestions}`;
-    answer.value = "";
-    answerArea.style.display = "none";
-    message.textContent = "";
-
-    // Important : aucune réponse n'est affichée ici.
-    audio.src = "sounds/" + currentNote.file;
-    audio.load();
-
-    playBtn.disabled = false;
-    playBtn.textContent = "▶ Jouer la note";
-    }
-
-    async function playNote() {
-    try {
-        audio.currentTime = 0;
-        await audio.play();
-        answerArea.style.display = "block";
-        message.textContent = "";
-    } catch (e) {
-        message.textContent =
-        "Impossible de jouer le fichier. Vérifie le nom du fichier et le dossier sounds/.";
-        console.error(e);
-    }
-    }
-
-    function submitAnswer() {
-    if (!answer.value) {
-        message.textContent = "Choisis une réponse avant de continuer.";
-        return;
-    }
-
-    // La réponse réelle n'est révélée nulle part ici.
-    results.push({
-        question: current + 1,
-        expected: currentNote.id,
-        expectedName: currentNote.name,
-        answer: answer.value,
-        answerName: answer.options[answer.selectedIndex].text,
-        correct: answer.value === currentNote.id
-    });
-
-    current++;
-
-    if (current >= totalQuestions) {
-        showResults();
-    } else {
-        loadQuestion();
-    }
-    }
-
-    function showResults() {
-    test.style.display = "none";
-    resultsBox.style.display = "block";
-
-    const correct = results.filter(r => r.correct).length;
-    const percentage = Math.round(correct / totalQuestions * 100);
-
-    document.getElementById("score").innerHTML =
-        `<strong>${correct} / ${totalQuestions} — ${percentage} %</strong>`;
-
-    // Statistiques par note
-    const stats = {};
-    for (const n of NOTES) {
-        stats[n.id] = { name: n.name, total: 0, correct: 0 };
-    }
-
-    for (const r of results) {
-        stats[r.expected].total++;
-        if (r.correct) stats[r.expected].correct++;
-    }
-
-    let table = `
-        <table>
-        <tr>
-            <th>Note</th>
-            <th>Correct</th>
-            <th>Total</th>
-            <th>Précision</th>
-        </tr>`;
-
-    for (const n of NOTES) {
-        const s = stats[n.id];
-        const pct = s.total ? Math.round(s.correct / s.total * 100) : 0;
-        table += `
-        <tr>
-            <td>${s.name}</td>
-            <td>${s.correct}</td>
-            <td>${s.total}</td>
-            <td>${pct} %</td>
-        </tr>`;
-    }
-
-    table += "</table>";
-    document.getElementById("byNote").innerHTML = table;
-
-    // Erreurs
-    const mistakes = results.filter(r => !r.correct);
-
-    if (mistakes.length === 0) {
-        document.getElementById("mistakes").innerHTML =
-        "<p class='ok'>Aucune erreur ! 🎉</p>";
-    } else {
-        let table2 = `
-        <table>
-            <tr>
-            <th>#</th>
-            <th>Réponse donnée</th>
-            <th>Bonne réponse</th>
-            </tr>`;
-
-        for (const r of mistakes) {
-        table2 += `
-            <tr>
-            <td>${r.question}</td>
-            <td>${r.answerName}</td>
-            <td>${r.expectedName}</td>
-            </tr>`;
-        }
-
-        table2 += "</table>";
-        document.getElementById("mistakes").innerHTML = table2;
-    }
-    }
-
-    startBtn.addEventListener("click", startTest);
-    playBtn.addEventListener("click", playNote);
-    nextBtn.addEventListener("click", submitAnswer);
-    restartBtn.addEventListener("click", () => {
-    resultsBox.style.display = "none";
-    setup.style.display = "block";
-    });
-    </script>
+    <script type="module" src="app.js" defer></script>
 </body>
 </html>
