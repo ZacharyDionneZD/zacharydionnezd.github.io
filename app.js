@@ -23,9 +23,6 @@ const setup = document.getElementById("setup");
 const test = document.getElementById("test");
 const resultsBox = document.getElementById("results");
 
-const questionCount = document.getElementById("questionCount");
-const answer = document.getElementById("answer");
-
 const startBtn = document.getElementById("startBtn");
 const playBtn = document.getElementById("playBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -33,18 +30,39 @@ const restartBtn = document.getElementById("restartBtn");
 
 const audio = document.getElementById("audio");
 const answerArea = document.getElementById("answerArea");
+const answer = document.getElementById("answer");
 const progress = document.getElementById("progress");
 const message = document.getElementById("message");
 
-function shuffle(array) {
-    const copy = [...array];
+function getCustomSelect(name) {
+    return document.querySelector(`[data-select="${name}"]`);
+}
 
-    for (let i = copy.length - 1; i > 0; i--) {
+function getCustomSelectValue(name) {
+    return getCustomSelect(name).value;
+}
+
+function getCustomSelectLabel(name) {
+    const select = getCustomSelect(name);
+    const option = Array.from(select.children)
+        .find(option => option.getAttribute("value") === select.value);
+
+    return option?.textContent.trim() ?? "";
+}
+
+function setCustomSelectValue(name, value) {
+    getCustomSelect(name).value = value;
+}
+
+function shuffle(array) {
+    const a = [...array];
+
+    for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
+        [a[i], a[j]] = [a[j], a[i]];
     }
 
-    return copy;
+    return a;
 }
 
 function generateTest(count) {
@@ -58,7 +76,10 @@ function generateTest(count) {
 }
 
 function startTest() {
-    totalQuestions = Number(questionCount.value);
+    totalQuestions = Number(
+        getCustomSelectValue("questionCount")
+    );
+
     current = 0;
     results = [];
     testNotes = generateTest(totalQuestions);
@@ -74,12 +95,12 @@ function loadQuestion() {
     currentNote = testNotes[current];
 
     progress.textContent = `${current + 1} / ${totalQuestions}`;
-
-    answer.value = "";
+    setCustomSelectValue("answer", "");
     answerArea.style.display = "none";
     message.textContent = "";
 
-    audio.src = `sounds/${currentNote.file}`;
+    // Important : aucune réponse n'est affichée ici.
+    audio.src = "sounds/" + currentNote.file;
     audio.load();
 
     playBtn.disabled = false;
@@ -93,33 +114,28 @@ async function playNote() {
 
         answerArea.style.display = "block";
         message.textContent = "";
-        answer.focus();
     } catch (error) {
         message.textContent =
             "Impossible de jouer le fichier. Vérifie le nom du fichier et le dossier sounds/.";
+
         console.error(error);
     }
 }
 
 function submitAnswer() {
-    const answerValue = answer.value;
-
-    if (!answerValue) {
+    if (!getCustomSelectValue("answer")) {
         message.textContent = "Choisis une réponse avant de continuer.";
-        answer.focus();
         return;
     }
 
-    const selectedOption = Array.from(answer.children)
-        .find(option => option instanceof AppOption && option.selected);
-
+    // La réponse réelle n'est révélée nulle part ici.
     results.push({
         question: current + 1,
         expected: currentNote.id,
         expectedName: currentNote.name,
-        answer: answerValue,
-        answerName: selectedOption?.textContent.trim() ?? "",
-        correct: answerValue === currentNote.id
+        answer: getCustomSelectValue("answer"),
+        answerName: getCustomSelectLabel("answer"),
+        correct: getCustomSelectValue("answer") === currentNote.id
     });
 
     current++;
@@ -135,7 +151,7 @@ function showResults() {
     test.style.display = "none";
     resultsBox.style.display = "block";
 
-    const correct = results.filter(result => result.correct).length;
+    const correct = results.filter(r => r.correct).length;
     const percentage = Math.round(correct / totalQuestions * 100);
 
     document.getElementById("score").innerHTML =
@@ -225,5 +241,5 @@ nextBtn.addEventListener("click", submitAnswer);
 restartBtn.addEventListener("click", () => {
     resultsBox.style.display = "none";
     setup.style.display = "block";
-    questionCount.focus();
 });
+
