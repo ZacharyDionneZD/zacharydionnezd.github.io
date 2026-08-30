@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v1'; // Changez ici à chaque modification (v2, v3...)
+const CACHE_NAME = 'v2'; // Changez ici à chaque modification (v2, v3...)
 
 const urlsToCache = [
   '/',
