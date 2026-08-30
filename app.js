@@ -35,7 +35,7 @@ const progress = document.getElementById("progress");
 const message = document.getElementById("message");
 
 function getCustomSelect(name) {
-    return document.querySelector(`[data-select="${name}"]`);
+    return document.getElementById(name);
 }
 
 function getCustomSelectValue(name) {
@@ -45,7 +45,10 @@ function getCustomSelectValue(name) {
 function getCustomSelectLabel(name) {
     const select = getCustomSelect(name);
     const option = Array.from(select.children)
-        .find(option => option.getAttribute("value") === select.value);
+        .find(option =>
+            option.tagName.toLowerCase() === "app-option" &&
+            option.getAttribute("value") === select.value
+        );
 
     return option?.textContent.trim() ?? "";
 }
