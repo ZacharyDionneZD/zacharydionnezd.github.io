@@ -10,7 +10,19 @@ const urlsToCache = [
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
   '/icons/icon-192x192-maskable.png',
-  '/icons/icon-512x512-maskable.png'
+  '/icons/icon-512x512-maskable.png',
+  '/sounds/A4.wav',
+  '/sounds/Asharp4.wav',
+  '/sounds/B4.wav',
+  '/sounds/C4.wav',
+  '/sounds/Csharp4.wav',
+  '/sounds/D4.wav',
+  '/sounds/Dsharp4.wav',
+  '/sounds/E4.wav',
+  '/sounds/F4.wav',
+  '/sounds/Fsharp4.wav',
+  '/sounds/G4.wav',
+  '/sounds/Gsharp4.wav'
 ];
 
 // 1. Installation : Mise en cache initiale
