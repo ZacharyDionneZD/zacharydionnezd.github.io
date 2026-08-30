@@ -34,16 +34,16 @@ const answer = document.getElementById("answer");
 const progress = document.getElementById("progress");
 const message = document.getElementById("message");
 
-function getCustomSelect(name) {
-    return document.getElementById(name);
+function getCustomSelect(id) {
+    return document.getElementById(id);
 }
 
-function getCustomSelectValue(name) {
-    return getCustomSelect(name).value;
+function getCustomSelectValue(id) {
+    return getCustomSelect(id).value;
 }
 
-function getCustomSelectLabel(name) {
-    const select = getCustomSelect(name);
+function getCustomSelectLabel(id) {
+    const select = getCustomSelect(id);
     const option = Array.from(select.children)
         .find(option =>
             option.tagName.toLowerCase() === "app-option" &&
@@ -53,8 +53,8 @@ function getCustomSelectLabel(name) {
     return option?.textContent.trim() ?? "";
 }
 
-function setCustomSelectValue(name, value) {
-    getCustomSelect(name).value = value;
+function setCustomSelectValue(id, value) {
+    getCustomSelect(id).value = value;
 }
 
 function shuffle(array) {
@@ -173,7 +173,7 @@ async function playNote() {
         message.textContent = "";
     } catch (error) {
         message.textContent =
-            "Impossible de jouer le fichier. Vérifie le nom du fichier et le dossier sounds/.";
+            "Impossible de jouer le fichier.";
 
         console.error(error);
     }
