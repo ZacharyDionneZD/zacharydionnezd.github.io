@@ -69,13 +69,67 @@ function shuffle(array) {
 }
 
 function generateTest(count) {
-    const pool = [];
-
-    while (pool.length < count) {
-        pool.push(...shuffle(NOTES));
+    if (count <= 0) {
+        return [];
     }
 
-    return pool.slice(0, count);
+    // Pour un quiz plus court que le nombre de notes, chaque note ne peut
+    // évidemment pas être représentée. On prend simplement des notes
+    // différentes et on les mélange.
+    if (count < NOTES.length) {
+        const test = shuffle(NOTES).slice(0, count);
+
+        // Garantit l'absence de doublon consécutif (ce cas est déjà garanti
+        // puisque toutes les notes du tableau sont distinctes).
+        return test;
+    }
+
+    const test = [];
+    const fullCycles = Math.floor(count / NOTES.length);
+    const remainder = count % NOTES.length;
+
+    // Chaque cycle contient toutes les notes exactement une fois.
+    // On ajuste son premier élément pour éviter une répétition à la
+    // jonction avec le cycle précédent.
+    for (let cycle = 0; cycle < fullCycles; cycle++) {
+        const notes = shuffle(NOTES);
+
+        if (test.length > 0 && notes[0].id === test[test.length - 1].id) {
+            const swapIndex = notes.findIndex(
+                note => note.id !== test[test.length - 1].id
+            );
+
+            [notes[0], notes[swapIndex]] = [notes[swapIndex], notes[0]];
+        }
+
+        test.push(...notes);
+    }
+
+    // Ajoute le reste du quiz à partir d'un sous-ensemble de notes.
+    if (remainder > 0) {
+        const notes = shuffle(NOTES).slice(0, remainder);
+
+        if (notes[0].id === test[test.length - 1].id) {
+            if (notes.length > 1) {
+                const swapIndex = notes.findIndex(
+                    note => note.id !== test[test.length - 1].id
+                );
+
+                [notes[0], notes[swapIndex]] = [notes[swapIndex], notes[0]];
+            } else {
+                // Avec un seul emplacement restant, il faut choisir une
+                // autre note. Cela n'affecte pas la garantie de couverture :
+                // toutes les notes ont déjà été jouées dans les cycles.
+                notes[0] = shuffle(
+                    NOTES.filter(note => note.id !== test[test.length - 1].id)
+                )[0];
+            }
+        }
+
+        test.push(...notes);
+    }
+
+    return test;
 }
 
 function startTest() {
