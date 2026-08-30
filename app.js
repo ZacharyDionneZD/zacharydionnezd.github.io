@@ -1,16 +1,16 @@
 const NOTES = [
-    { id: "C",  name: "Do",       file: "C4.wav" },
-    { id: "C#", name: "Do♯",      file: "Csharp4.wav" },
-    { id: "D",  name: "Ré",       file: "D4.wav" },
-    { id: "D#", name: "Ré♯",      file: "Dsharp4.wav" },
-    { id: "E",  name: "Mi",       file: "E4.wav" },
-    { id: "F",  name: "Fa",       file: "F4.wav" },
-    { id: "F#", name: "Fa♯",      file: "Fsharp4.wav" },
-    { id: "G",  name: "Sol",      file: "G4.wav" },
-    { id: "G#", name: "Sol♯",     file: "Gsharp4.wav" },
-    { id: "A",  name: "La",       file: "A4.wav" },
-    { id: "A#", name: "La♯",      file: "Asharp4.wav" },
-    { id: "B",  name: "Si",       file: "B4.wav" }
+    { id: "C",  name: "Do",       file: "C4.opus" },
+    { id: "C#", name: "Do♯",      file: "Csharp4.opus" },
+    { id: "D",  name: "Ré",       file: "D4.opus" },
+    { id: "D#", name: "Ré♯",      file: "Dsharp4.opus" },
+    { id: "E",  name: "Mi",       file: "E4.opus" },
+    { id: "F",  name: "Fa",       file: "F4.opus" },
+    { id: "F#", name: "Fa♯",      file: "Fsharp4.opus" },
+    { id: "G",  name: "Sol",      file: "G4.opus" },
+    { id: "G#", name: "Sol♯",     file: "Gsharp4.opus" },
+    { id: "A",  name: "La",       file: "A4.opus" },
+    { id: "A#", name: "La♯",      file: "Asharp4.opus" },
+    { id: "B",  name: "Si",       file: "B4.opus" }
 ];
 
 let totalQuestions = 100;
