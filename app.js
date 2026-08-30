@@ -1,5 +1,3 @@
-"use strict";
-
 const NOTES = [
     { id: "C",  name: "Do",       file: "C4.wav" },
     { id: "C#", name: "Do♯",      file: "Csharp4.wav" },
@@ -21,10 +19,12 @@ let currentNote = null;
 let results = [];
 let testNotes = [];
 
-// DOM
 const setup = document.getElementById("setup");
 const test = document.getElementById("test");
 const resultsBox = document.getElementById("results");
+
+const questionCount = document.getElementById("questionCount");
+const answer = document.getElementById("answer");
 
 const startBtn = document.getElementById("startBtn");
 const playBtn = document.getElementById("playBtn");
@@ -33,23 +33,20 @@ const restartBtn = document.getElementById("restartBtn");
 
 const audio = document.getElementById("audio");
 const answerArea = document.getElementById("answerArea");
-const answer = document.getElementById("answer");
 const progress = document.getElementById("progress");
 const message = document.getElementById("message");
 
-// Fisher-Yates shuffle
 function shuffle(array) {
-    const a = [...array];
+    const copy = [...array];
 
-    for (let i = a.length - 1; i > 0; i--) {
+    for (let i = copy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+        [copy[i], copy[j]] = [copy[j], copy[i]];
     }
 
-    return a;
+    return copy;
 }
 
-// Chaque note apparaît autant que possible.
 function generateTest(count) {
     const pool = [];
 
@@ -61,10 +58,7 @@ function generateTest(count) {
 }
 
 function startTest() {
-    totalQuestions = Number(
-        document.getElementById("questionCount").value
-    );
-
+    totalQuestions = Number(questionCount.value);
     current = 0;
     results = [];
     testNotes = generateTest(totalQuestions);
@@ -80,12 +74,12 @@ function loadQuestion() {
     currentNote = testNotes[current];
 
     progress.textContent = `${current + 1} / ${totalQuestions}`;
+
     answer.value = "";
     answerArea.style.display = "none";
     message.textContent = "";
 
-    // La réponse correcte n'est jamais affichée pendant le test.
-    audio.src = "sounds/" + currentNote.file;
+    audio.src = `sounds/${currentNote.file}`;
     audio.load();
 
     playBtn.disabled = false;
@@ -99,28 +93,33 @@ async function playNote() {
 
         answerArea.style.display = "block";
         message.textContent = "";
+        answer.focus();
     } catch (error) {
         message.textContent =
             "Impossible de jouer le fichier. Vérifie le nom du fichier et le dossier sounds/.";
-
         console.error(error);
     }
 }
 
 function submitAnswer() {
-    if (!answer.value) {
+    const answerValue = answer.value;
+
+    if (!answerValue) {
         message.textContent = "Choisis une réponse avant de continuer.";
+        answer.focus();
         return;
     }
 
-    // La réponse réelle n'est révélée nulle part ici.
+    const selectedOption = Array.from(answer.children)
+        .find(option => option instanceof AppOption && option.selected);
+
     results.push({
         question: current + 1,
         expected: currentNote.id,
         expectedName: currentNote.name,
-        answer: answer.value,
-        answerName: answer.options[answer.selectedIndex].text,
-        correct: answer.value === currentNote.id
+        answer: answerValue,
+        answerName: selectedOption?.textContent.trim() ?? "",
+        correct: answerValue === currentNote.id
     });
 
     current++;
@@ -187,7 +186,6 @@ function showResults() {
     }
 
     table += "</table>";
-
     document.getElementById("byNote").innerHTML = table;
 
     const mistakes = results.filter(result => !result.correct);
@@ -216,7 +214,6 @@ function showResults() {
         }
 
         table2 += "</table>";
-
         document.getElementById("mistakes").innerHTML = table2;
     }
 }
@@ -228,4 +225,5 @@ nextBtn.addEventListener("click", submitAnswer);
 restartBtn.addEventListener("click", () => {
     resultsBox.style.display = "none";
     setup.style.display = "block";
+    questionCount.focus();
 });
