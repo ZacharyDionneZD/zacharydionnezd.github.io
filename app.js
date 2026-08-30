@@ -34,6 +34,21 @@ const answer = document.getElementById("answer");
 const progress = document.getElementById("progress");
 const message = document.getElementById("message");
 
+function registerServiceWorker() {
+    // Vérifie si le navigateur supporte les Service Workers
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('Service Worker enregistré avec succès. Scope:', registration.scope);
+            })
+            .catch(error => {
+                console.error('Échec de l\'enregistrement du Service Worker:', error);
+            });
+        });
+    }
+}
+
 function getCustomSelect(id) {
     return document.getElementById(id);
 }
@@ -290,6 +305,8 @@ function showResults() {
         document.getElementById("mistakes").innerHTML = table2;
     }
 }
+
+registerServiceWorker();
 
 startBtn.addEventListener("click", startTest);
 playBtn.addEventListener("click", playNote);
