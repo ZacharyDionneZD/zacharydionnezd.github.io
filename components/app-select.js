@@ -11,7 +11,7 @@
  *   app-select::part(button)
  *   app-select::part(options-container)
  */
-import { AppOption } from "app-option.js";
+import { AppOption } from "./app-option.js";
 
 class AppSelect extends HTMLElement {
     static observedAttributes = ["value", "disabled"];
